@@ -115,9 +115,12 @@
 
     /* พื้นที่เล่นสื่อ */
     .stage{position:absolute;top:0;left:0;right:0;bottom:8.336vh;background:#000}
-    video,img,iframe{position:absolute;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:#000}
-    video,img{object-fit:contain} /* เลือก cover ได้ถ้าต้องการครอบ */
-    iframe{border:0}
+    .stage video,
+    .stage img,
+    .stage iframe{position:absolute;top:0;left:0;width:100%;height:100%;background:#000}
+    .stage video,
+    .stage img{object-fit:contain} /* เลือก cover ได้ถ้าต้องการครอบ */
+    .stage iframe{border:0}
 
     /* สถานะ */
     #status{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
