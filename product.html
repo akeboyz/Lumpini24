@@ -2780,12 +2780,22 @@
 
       title.textContent = `${product.name_en || product.name_th || 'Product'} - Location`;
 
-      // Check if we're in Yodeck offline environment (no internet)
-      const isOffline = !navigator.onLine || window.location.protocol === 'file:';
+      // Detect kiosk/Yodeck environment
+      const isKioskMode = window.location.search.includes('kiosk') ||
+                         window.location.search.includes('yodeck') ||
+                         navigator.userAgent.includes('Fully') ||
+                         navigator.userAgent.includes('Kiosk') ||
+                         window.location.protocol === 'file:';
 
-      // Try to load the iframe, but show fallback if it fails
-      if (product.map_embed_url && !isOffline) {
-        // Online mode: Try to show embedded map with error handling
+      const isOffline = !navigator.onLine;
+
+      // In kiosk mode or if offline, always show fallback with QR code
+      // This avoids iframe blocking issues in Fully Kiosk Browser
+      if (isKioskMode || isOffline || !product.map_embed_url) {
+        console.log('Kiosk/offline mode detected, showing fallback');
+        showMapFallback();
+      } else {
+        // Regular browser mode: Try to show embedded map
         iframe.style.display = 'block';
         mapFallback.style.display = 'none';
         iframe.src = product.map_embed_url;
@@ -2797,24 +2807,19 @@
           showMapFallback();
         };
 
-        // Also check after a timeout if iframe loaded
+        // Check after timeout if iframe actually loaded
         setTimeout(() => {
           try {
-            // If iframe is still visible but might be blocked, we can't directly detect it
-            // So we just ensure fallback is ready
-            if (iframe.style.display === 'block') {
-              console.log('Map iframe appears to be loading');
+            // Try to access iframe content to detect blocking
+            if (iframe.contentWindow) {
+              console.log('Map iframe appears accessible');
             }
           } catch (e) {
+            // Cross-origin or blocked, show fallback
+            console.warn('Map iframe blocked, showing fallback');
             showMapFallback();
           }
-        }, 3000);
-
-        const offlineMap = document.getElementById('mapContainer')?.querySelector('.offline-map');
-        if (offlineMap) offlineMap.style.display = 'none';
-      } else {
-        // Offline mode or no embed URL: Show fallback
-        showMapFallback();
+        }, 2000);
       }
 
       function showMapFallback() {
