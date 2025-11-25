@@ -2780,47 +2780,11 @@
 
       title.textContent = `${product.name_en || product.name_th || 'Product'} - Location`;
 
-      // Detect kiosk/Yodeck environment
-      const isKioskMode = window.location.search.includes('kiosk') ||
-                         window.location.search.includes('yodeck') ||
-                         navigator.userAgent.includes('Fully') ||
-                         navigator.userAgent.includes('Kiosk') ||
-                         window.location.protocol === 'file:';
-
-      const isOffline = !navigator.onLine;
-
-      // In kiosk mode or if offline, always show fallback with QR code
-      // This avoids iframe blocking issues in Fully Kiosk Browser
-      if (isKioskMode || isOffline || !product.map_embed_url) {
-        console.log('Kiosk/offline mode detected, showing fallback');
-        showMapFallback();
-      } else {
-        // Regular browser mode: Try to show embedded map
-        iframe.style.display = 'block';
-        mapFallback.style.display = 'none';
-        iframe.src = product.map_embed_url;
-
-        // Listen for iframe load errors and show fallback
-        iframe.onerror = () => {
-          console.warn('Map iframe failed to load, showing fallback');
-          iframe.style.display = 'none';
-          showMapFallback();
-        };
-
-        // Check after timeout if iframe actually loaded
-        setTimeout(() => {
-          try {
-            // Try to access iframe content to detect blocking
-            if (iframe.contentWindow) {
-              console.log('Map iframe appears accessible');
-            }
-          } catch (e) {
-            // Cross-origin or blocked, show fallback
-            console.warn('Map iframe blocked, showing fallback');
-            showMapFallback();
-          }
-        }, 2000);
-      }
+      // Google Maps iframe is frequently blocked by X-Frame-Options
+      // Always use QR code + button fallback for better reliability
+      // This is the best approach for kiosk/signage environments
+      console.log('Showing map fallback (QR code + button) - iframe blocked by Google');
+      showMapFallback();
 
       function showMapFallback() {
         iframe.style.display = 'none';
