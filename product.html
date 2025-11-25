@@ -1731,7 +1731,6 @@
               <img id="fallbackQRImage" style="width: 120px; height: 120px; border: 2px solid #ddd; border-radius: 12px;" alt="QR Code">
               <div style="font-size: 0.875rem; color: #666; margin-top: 8px;">Scan to open in Maps</div>
             </div>
-            <button id="openMapButton" style="padding: 12px 24px; background: #4285f4; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 16px;">Open in Google Maps</button>
             <div id="fallbackAddress" style="font-size: 1rem; color: #555; line-height: 1.4; margin-top: 20px;"></div>
           </div>
         </div>
@@ -2776,14 +2775,13 @@
       const mapFallback = document.getElementById('mapFallback');
       const fallbackAddress = document.getElementById('fallbackAddress');
       const fallbackQRImage = document.getElementById('fallbackQRImage');
-      const openMapButton = document.getElementById('openMapButton');
 
       title.textContent = `${product.name_en || product.name_th || 'Product'} - Location`;
 
       // Google Maps iframe is frequently blocked by X-Frame-Options
-      // Always use QR code + button fallback for better reliability
+      // Always use QR code fallback for better reliability
       // This is the best approach for kiosk/signage environments
-      console.log('Showing map fallback (QR code + button) - iframe blocked by Google');
+      console.log('Showing map fallback (QR code only) - iframe blocked by Google');
       showMapFallback();
 
       function showMapFallback() {
@@ -2799,13 +2797,6 @@
         if (product.map_url) {
           const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(product.map_url)}`;
           fallbackQRImage.src = qrUrl;
-
-          // Set up button to open map
-          if (openMapButton) {
-            openMapButton.onclick = () => {
-              window.open(product.map_url, '_blank');
-            };
-          }
         }
       }
 
